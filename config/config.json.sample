@@ -1,0 +1,9 @@
+{
+    "token" : "",
+    "database": "taso",
+    "dbuser" : "taso",
+    "dbpasswd": "myawesomedbpw",
+    "dbhost": "localhost",
+    "owner" : ["109710323094683648"],
+    "dbtype": "sqlite"
+}
