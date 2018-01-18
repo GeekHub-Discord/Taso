@@ -1,5 +1,16 @@
 import discord
-from main import get_logger
+
+def get_logger(name):
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        logger.setLevel(logging.DEBUG)
+        logger.propagate = False
+        formatter = logging.Formatter(
+            '%(asctime)s [%(levelname)s] %(module)s:%(lineno)d: %(message)s')
+        sh = logging.StreamHandler()
+        sh.setFormatter(formatter)
+        logger.addHandler(sh)
+    return logger
 
 logger = get_logger()
 
