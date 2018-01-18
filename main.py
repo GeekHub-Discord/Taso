@@ -210,8 +210,23 @@ async def on_message(message):
                     # User leveled up on the server
                     lmsg = await client.send_message(message.channel,
                             f"{party} {message.author.name}, you have leveled up to level {level} on {message.server.name}!! {party}")
+                    try:
+                        role = Role.get(Role.awardlevel == level)
+                        lastrole = Role.select().where(
+                            Role.server == server and Role.awardlevel is not None).order_by(
+                                Role.awardlevel.desc()
+                            ).limit(1)
+                        if len(lastrole) > 0:
+                            r = discord.utils.get(message.server.roles, id=lastrole[0].rid)
+                            await client.remove_roles(message.author, r)
+                        r = discord.utils.get(message.server.roles, id=role.rid)
+                        await client.add_roles(message.author, r)
+                    except DoesNotExist as e:
+                        pass
             except Exception as e:
                 pass
+
+
 
             local.level = level
             local.experience = exp
