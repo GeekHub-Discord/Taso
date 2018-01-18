@@ -229,7 +229,7 @@ async def on_message(message):
                 if level > local.level:
                     # User leveled up on the server
                     lmsg = await client.send_message(message.channel,
-                            f"{party} {message.author.name}, you have leveled up to level {level} on {message.server.name}!! {party}")
+                            f"{party} {message.author.name}, you have leveled up to level {level} on {message.server.name}! {party}")
                     try:
                         role = Role.get(Role.awardlevel == level)
                         lastrole = Role.select().where(
