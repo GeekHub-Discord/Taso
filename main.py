@@ -47,6 +47,7 @@ async def reply(text, message):
 @bot.command('announce_channel', discord.Permissions(32))
 async def announce_channel(message):
     server.announce_channel = message.channel.id
+    await reply(f"I will now do server level up announcements here.", message)
 
 @bot.command('iam')
 async def add_role(message):
