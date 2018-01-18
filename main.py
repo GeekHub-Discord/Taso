@@ -222,7 +222,7 @@ async def on_message(message):
                         r = discord.utils.get(message.server.roles, id=role.rid)
                         await client.add_roles(message.author, r)
                     except DoesNotExist as e:
-                        pass
+                        print("Could not find a level reward!")
             except Exception as e:
                 pass
 
