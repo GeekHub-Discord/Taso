@@ -237,10 +237,11 @@ async def on_message(message):
                         for lrole in lastrole:
                             logger.info(f"Removing old role: {lrole.rid}")
                             r = discord.utils.get(message.server.roles, id=f'{lrole.rid}')
+                            logger.info(f"Got role {r.name}")
                             try:
                                 await client.remove_roles(message.author, r)
                             except BaseException as e:
-                                pass
+                                logger.exception("Couldn't remove role")
                         r = discord.utils.get(message.server.roles, id=f'{role.rid}')
                         await client.add_roles(message.author, r)
                     except DoesNotExist as e:
