@@ -202,7 +202,7 @@ async def leaderboard(message):
 
 @client.event
 async def on_ready():
-    print(f"{client.user.name} ({client.user.id}) is now online!")
+    logger.info(f"{client.user.name} ({client.user.id}) is now online!")
 
 @client.event
 async def on_message(message):

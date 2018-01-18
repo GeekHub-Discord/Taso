@@ -1,4 +1,7 @@
 import discord
+from main import get_logger
+
+logger = get_logger()
 
 class Bot():
     def __init__(self, client):
@@ -6,9 +9,8 @@ class Bot():
         self.client = client
 
     def command(self, name, permission=discord.Permissions()):
-        print(f"OUTSIDE DECORATOR - Registering command {name}")
         def decorator(f):
-            print(f"Registering command {name}")
+            logger.info(f"Registering command {name}")
             self.commands[name] = (f, permission)
             return f
         return decorator
