@@ -228,7 +228,10 @@ async def on_message(message):
                     try:
                         role = Role.get(Role.awardlevel == level)
                         lastrole = Role.select().where(
-                            Role.server == server and Role.awardlevel.is_null(False)).order_by(
+                            Role.server == server and
+                            Role.awardlevel.is_null(False) and
+                            Role.awardlevel < level
+                            ).order_by(
                                 Role.awardlevel.desc()
                             ).limit(1)
                         if len(lastrole) > 0:
