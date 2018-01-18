@@ -2,6 +2,8 @@ import asyncio
 import config
 import discord
 import uvloop
+from bot import Bot
+from functools import wraps
 from models import *
 
 party = "🎉"
@@ -9,6 +11,8 @@ party = "🎉"
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 client = discord.Client()
+
+bot = Bot(client)
 
 async def mxp(level):
     return (45 + (5 * level))
@@ -30,6 +34,96 @@ async def levelup(level, exp):
 
 lock = asyncio.Lock()
 
+@bot.command('announce_channel', discord.Permissions(32))
+async def announce_channel(message):
+    server.announce_channel = message.channel.id
+
+@bot.command('iam')
+async def add_role(message):
+    splitmsg = message.content.split()
+    rolename = ' '.join(splitmsg[1:])
+    role = discord.util.get(message.server.roles, name=rolename)
+    try:
+        r = Role.get(Role.rid == role.id)
+        if r.assignable:
+            await client.add_roles(message.author, role)
+    except DoesNotExist as e:
+        return
+
+@bot.command('iamnot')
+async def remove_role(message):
+    splitmsg = message.content.split()
+    rolename = ' '.join(splitmsg[1:])
+    role = discord.util.get(message.server.roles, name=rolename)
+    try:
+        r = Role.get(Role.rid == role.id)
+        if r.assignable:
+            await client.remove_roles(message.author, role)
+    except DoesNotExist as e:
+        return
+
+@bot.command('addrole', discord.Permissions(32))
+async def add_role(message):
+    # Adds an assignable role
+    splitmsg = message.content.split()
+    rolename = ' '.join(splitmsg[1:])
+    role = discord.util.get(message.server.roles, name=rolename)
+    server = Server.get(Server.sid == message.server.id)
+    r, created = Role.get_or_create(
+        rid=role.id,
+        defaults={
+            'assignable': True,
+            'server': server
+        }
+    )
+    if not created:
+        r.assignable = True
+        r.save()
+
+@bot.command('removerole', discord.Permission(32))
+async def remove_role(message):
+    splitmsg = message.content.split()
+    rolename = ' '.join(splitmsg[1:])
+    role = discord.util.get(message.server.roles, name=rolename)
+    try:
+        r = Role.get(Role.rid == role.id)
+        r.assignable = False
+        r.save()
+    except DoesNotExist as e:
+        return
+
+@bot.command('addreward', discord.Permission(32))
+async def add_reward(message):
+    # Adds an reward role
+    splitmsg = message.content.split()
+    rolename = ' '.join(splitmsg[1:-1])
+    level = splitmsg[-1]
+    role = discord.util.get(message.server.roles, name=rolename)
+    server = Server.get(Server.sid == message.server.id)
+    r, created = Role.get_or_create(
+        rid=role.id,
+        defaults={
+            'awardlevel': level,
+            'server': server
+        }
+    )
+    if not created:
+        r.awardlevel = level
+        r.save()
+
+@bot.command('removereward', discord.Permissions(32))
+async def remove_reward(message):
+    splitmsg = message.content.split()
+    rolename = ' '.join(splitmsg[1:])
+    role = discord.util.get(message.server.roles, name=rolename)
+    try:
+        r = Role.get(Role.rid == role.id)
+        r.awardlevel = None
+        r.save()
+    except DoesNotExist as e:
+        return
+
+
 @client.event
 async def on_message(message):
     lmsg = None
@@ -44,13 +138,10 @@ async def on_message(message):
                     user=user,
                     server=server)
 
-            if message.content.startswith('level.'):
-                # Command
-                if message.author.server_permissions.manage_server:
-                    splitmsg = message.content.split('.')
-                    if splitmsg[1] == 'announce':
-                        server.announce_channel = message.channel.id
-
+            if message.content.startswith('taso.'):
+                fields = message.content.split()
+                cmd = field[0].split('.')[1]
+                await bot.call(cmd, message)
 
             level, exp = await levelup(
                     server.level,

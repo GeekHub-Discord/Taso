@@ -27,16 +27,19 @@ class BaseModel(Model):
     class Meta:
         database = my_db
 
+
 class Server(BaseModel):
     sid = BigIntegerField(null=False, primary_key=True)
     announce_channel = BigIntegerField(null=True)
     experience = BigIntegerField(null=False, default=0)
     level = IntegerField(null=False, default=1)
 
+
 class User(BaseModel):
     uid = BigIntegerField(null=False, primary_key=True)
     experience = BigIntegerField(null=False, default=0)
     level = IntegerField(null=False, default=1)
+
 
 class LocalLevel(BaseModel):
     user = ForeignKeyField(User)
@@ -44,4 +47,12 @@ class LocalLevel(BaseModel):
     experience = BigIntegerField(null=False, default=0)
     level = IntegerField(null=False, default=1)
 
-my_db.create_tables([Server, User, LocalLevel], safe=True)
+
+class Role(BaseModel):
+    rid = BigIntegerField(null=False, primary_key=True)
+    awardlevel = IntegerField(null=True)
+    assignable = BooleanField(null=False, default=False)
+    server = ForeignKeyField(Server)
+
+
+my_db.create_tables([Server, User, LocalLevel, Role], safe=True)
