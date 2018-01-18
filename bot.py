@@ -16,4 +16,4 @@ class Bot():
         if handler and message.author.server_permissions.is_subset(handler[1]):
             return await handler[0](message)
         else:
-            raise ValueError('Command "{command}" has is not registered')
+            raise ValueError(f'Command "{command}" has is not registered')
