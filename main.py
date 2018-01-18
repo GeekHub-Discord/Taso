@@ -232,12 +232,12 @@ async def on_message(message):
                                 Role.awardlevel.desc()
                             ).limit(1)
                         if len(lastrole) > 0:
-                            r = discord.utils.get(message.server.roles, id=lastrole[0].rid)
+                            r = discord.utils.get(message.server.roles, id=f'{lastrole[0].rid}')
                             try:
                                 await client.remove_roles(message.author, r)
                             except BaseException as e:
                                 pass
-                        r = discord.utils.get(message.server.roles, id=role.rid)
+                        r = discord.utils.get(message.server.roles, id=f'{role.rid}')
                         await client.add_roles(message.author, r)
                     except DoesNotExist as e:
                         logger.exception("Could not find level up reward")
