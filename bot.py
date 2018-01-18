@@ -1,4 +1,5 @@
 import discord
+import logging
 
 def get_logger(name):
     logger = logging.getLogger(name)
