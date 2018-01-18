@@ -1,3 +1,4 @@
+import discord
 
 class Bot():
     def __init__(self, client):
