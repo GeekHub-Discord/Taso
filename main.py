@@ -233,7 +233,10 @@ async def on_message(message):
                             ).limit(1)
                         if len(lastrole) > 0:
                             r = discord.utils.get(message.server.roles, id=lastrole[0].rid)
-                            await client.remove_roles(message.author, r)
+                            try:
+                                await client.remove_roles(message.author, r)
+                            except BaseException as e:
+                                pass
                         r = discord.utils.get(message.server.roles, id=role.rid)
                         await client.add_roles(message.author, r)
                     except DoesNotExist as e:
