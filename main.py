@@ -1,6 +1,7 @@
 import asyncio
 import config
 import discord
+import logging
 import uvloop
 from bot import Bot
 from functools import wraps
@@ -13,6 +14,20 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 client = discord.Client()
 
 bot = Bot(client)
+
+def get_logger(name):
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        logger.setLevel(logging.DEBUG)
+        logger.propagate = False
+        formatter = logging.Formatter(
+            '%(asctime)s [%(levelname)s] %(module)s:%(lineno)d: %(message)s')
+        sh = logging.StreamHandler()
+        sh.setFormatter(formatter)
+        logger.addHandler(sh)
+    return logger
+
+logger = get_logger('taso')
 
 async def mxp(level):
     return (45 + (5 * level))
@@ -222,9 +237,9 @@ async def on_message(message):
                         r = discord.utils.get(message.server.roles, id=role.rid)
                         await client.add_roles(message.author, r)
                     except DoesNotExist as e:
-                        print("Could not find a level reward!")
+                        logger.exception("Could not find level up reward")
             except Exception as e:
-                print(f"Error processing level up {e}")
+                logger.exception("Could not process level up")
 
 
 
