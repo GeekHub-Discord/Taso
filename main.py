@@ -233,9 +233,9 @@ async def on_message(message):
                             Role.awardlevel < level
                             ).order_by(
                                 Role.awardlevel.desc()
-                            ).limit(1)
-                        if len(lastrole) > 0:
-                            r = discord.utils.get(message.server.roles, id=f'{lastrole[0].rid}')
+                            )
+                        for lrole in lastrole:
+                            r = discord.utils.get(message.server.roles, id=f'{lrole.rid}')
                             try:
                                 await client.remove_roles(message.author, r)
                             except BaseException as e:
