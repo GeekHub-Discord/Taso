@@ -228,13 +228,14 @@ async def on_message(message):
                     try:
                         role = Role.get(Role.awardlevel == level)
                         lastrole = Role.select().where(
-                            Role.server == server and
-                            Role.awardlevel.is_null(False) and
-                            Role.awardlevel < level
+                            (Role.server == server) &
+                            (Role.awardlevel.is_null(False)) &
+                            (Role.awardlevel < level)
                             ).order_by(
                                 Role.awardlevel.desc()
                             )
                         for lrole in lastrole:
+                            logger.info(f"Removing old role: {lrole.rid}")
                             r = discord.utils.get(message.server.roles, id=f'{lrole.rid}')
                             try:
                                 await client.remove_roles(message.author, r)
