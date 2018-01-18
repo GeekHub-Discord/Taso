@@ -54,7 +54,7 @@ async def announce_channel(message):
 async def add_role(message):
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
-    role = discord.util.get(message.server.roles, name=rolename)
+    role = discord.utils.get(message.server.roles, name=rolename)
     try:
         r = Role.get(Role.rid == role.id)
         if r.assignable:
@@ -68,7 +68,7 @@ async def add_role(message):
 async def remove_role(message):
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
-    role = discord.util.get(message.server.roles, name=rolename)
+    role = discord.utils.get(message.server.roles, name=rolename)
     try:
         r = Role.get(Role.rid == role.id)
         if r.assignable:
@@ -83,7 +83,7 @@ async def add_role(message):
     # Adds an assignable role
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
-    role = discord.util.get(message.server.roles, name=rolename)
+    role = discord.utils.get(message.server.roles, name=rolename)
     server = Server.get(Server.sid == message.server.id)
     r, created = Role.get_or_create(
         rid=role.id,
@@ -102,7 +102,7 @@ async def add_role(message):
 async def remove_role(message):
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
-    role = discord.util.get(message.server.roles, name=rolename)
+    role = discord.utils.get(message.server.roles, name=rolename)
     try:
         r = Role.get(Role.rid == role.id)
         r.assignable = False
@@ -118,7 +118,7 @@ async def add_reward(message):
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:-1])
     level = splitmsg[-1]
-    role = discord.util.get(message.server.roles, name=rolename)
+    role = discord.utils.get(message.server.roles, name=rolename)
     server = Server.get(Server.sid == message.server.id)
     r, created = Role.get_or_create(
         rid=role.id,
@@ -140,7 +140,7 @@ async def add_reward(message):
 async def remove_reward(message):
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
-    role = discord.util.get(message.server.roles, name=rolename)
+    role = discord.utils.get(message.server.roles, name=rolename)
     try:
         r = Role.get(Role.rid == role.id)
         r.awardlevel = None
