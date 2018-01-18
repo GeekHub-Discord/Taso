@@ -34,6 +34,16 @@ async def levelup(level, exp):
 
 lock = asyncio.Lock()
 
+async def reply(text, message):
+    m = await client.send_message(
+        message.channel,
+        text
+    )
+    await asyncio.sleep(10)
+
+    await client.delete_message(m)
+    await client.delete_message(message)
+
 @bot.command('announce_channel', discord.Permissions(32))
 async def announce_channel(message):
     server.announce_channel = message.channel.id
@@ -50,6 +60,8 @@ async def add_role(message):
     except DoesNotExist as e:
         return
 
+    await reply(f"I have given you the {rolename} role", message)
+
 @bot.command('iamnot')
 async def remove_role(message):
     splitmsg = message.content.split()
@@ -61,6 +73,8 @@ async def remove_role(message):
             await client.remove_roles(message.author, role)
     except DoesNotExist as e:
         return
+
+    await reply(f"I have removed the {rolename} role from you", message)
 
 @bot.command('addrole', discord.Permissions(32))
 async def add_role(message):
@@ -80,6 +94,8 @@ async def add_role(message):
         r.assignable = True
         r.save()
 
+    await reply(f"The {rolename} role is now assignable", message)
+
 @bot.command('removerole', discord.Permissions(32))
 async def remove_role(message):
     splitmsg = message.content.split()
@@ -91,6 +107,8 @@ async def remove_role(message):
         r.save()
     except DoesNotExist as e:
         return
+
+    await reply(f"The {rolename} role is now assignable", message)
 
 @bot.command('addreward', discord.Permissions(32))
 async def add_reward(message):
@@ -111,6 +129,11 @@ async def add_reward(message):
         r.awardlevel = level
         r.save()
 
+    await reply(
+        f"The {rolename} role will now be given when a user hits level {level}",
+        message
+    )
+
 @bot.command('removereward', discord.Permissions(32))
 async def remove_reward(message):
     splitmsg = message.content.split()
@@ -122,6 +145,11 @@ async def remove_reward(message):
         r.save()
     except DoesNotExist as e:
         return
+
+    await reply(
+        f"The {rolename} role will no longer given as a levelling reward",
+        message
+    )
 
 
 @client.event
