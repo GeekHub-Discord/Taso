@@ -224,7 +224,7 @@ async def on_message(message):
                     except DoesNotExist as e:
                         print("Could not find a level reward!")
             except Exception as e:
-                pass
+                print(f"Error processing level up {e}")
 
 
 
