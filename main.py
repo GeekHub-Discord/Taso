@@ -180,6 +180,12 @@ async def on_ready():
 async def on_message(message):
     lmsg = None
     smsg = None
+    if not message.author.bot:
+        if message.content.startswith('taso.'):
+            fields = message.content.split()
+            cmd = fields[0].split('.')[1]
+            await bot.call(cmd, message)
+            return
     async with lock:
         if not message.author.bot:
             server, created = Server.get_or_create(
@@ -189,11 +195,6 @@ async def on_message(message):
             local, created = LocalLevel.get_or_create(
                     user=user,
                     server=server)
-
-            if message.content.startswith('taso.'):
-                fields = message.content.split()
-                cmd = fields[0].split('.')[1]
-                await bot.call(cmd, message)
 
             level, exp = await levelup(
                     server.level,
