@@ -174,6 +174,7 @@ async def remove_reward(message):
 
 @bot.command("profile")
 async def profile(message):
+    pass
 
 @bot.command("leaderboard")
 async def leaderboard(message):
