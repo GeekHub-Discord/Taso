@@ -171,7 +171,7 @@ async def on_message(message):
 
             if message.content.startswith('taso.'):
                 fields = message.content.split()
-                cmd = field[0].split('.')[1]
+                cmd = fields[0].split('.')[1]
                 await bot.call(cmd, message)
 
             level, exp = await levelup(
