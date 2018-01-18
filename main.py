@@ -80,7 +80,7 @@ async def add_role(message):
         r.assignable = True
         r.save()
 
-@bot.command('removerole', discord.Permission(32))
+@bot.command('removerole', discord.Permissions(32))
 async def remove_role(message):
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
@@ -92,7 +92,7 @@ async def remove_role(message):
     except DoesNotExist as e:
         return
 
-@bot.command('addreward', discord.Permission(32))
+@bot.command('addreward', discord.Permissions(32))
 async def add_reward(message):
     # Adds an reward role
     splitmsg = message.content.split()
