@@ -6,7 +6,9 @@ class Bot():
         self.client = client
 
     def command(self, name, permission=discord.Permissions()):
+        print(f"OUTSIDE DECORATOR - Registering command {name}")
         def decorator(f):
+            print(f"Registering command {name}")
             self.commands[name] = (f, permission)
             return f
         return decorator
