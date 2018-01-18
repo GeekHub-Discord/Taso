@@ -12,7 +12,7 @@ def get_logger(name):
         logger.addHandler(sh)
     return logger
 
-logger = get_logger()
+logger = get_logger('taso')
 
 class Bot():
     def __init__(self, client):
