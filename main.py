@@ -172,6 +172,33 @@ async def remove_reward(message):
         message
     )
 
+@bot.command("profile")
+async def profile(message):
+
+@bot.command("leaderboard")
+async def leaderboard(message):
+    server = Server.get(Server.sid == message.server.id)
+    leaders = LocalLevel.select().where(
+        LocalLevel.server == server
+    ).order_by(
+        LocalLevel.level.desc(), LocalLevel.experience.desc()
+    ).limit(10)
+
+    lines = []
+    lines.append(
+        f"{'Username'.ljust(32)}{'Level'.ljust(6)}{'XP'.ljust(6)}"
+    )
+    for l in leaders:
+        m = message.server.get_member(f"{l.user.uid}")
+        lines.append(
+            f"{m.name.ljust(32)}{str(l.level).ljust(6)}{str(l.experience).ljust(6)}"
+        )
+
+    message = '\n'.join(lines)
+
+    codeblock = "```{message}```"
+    await client.send_message(message.channel, codeblock)
+
 @client.event
 async def on_ready():
     print(f"{client.user.name} ({client.user.id}) is now online!")
