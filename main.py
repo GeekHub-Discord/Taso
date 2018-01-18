@@ -12,6 +12,9 @@ party = "🎉"
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 client = discord.Client()
+pool = concurrent.futures.ThreadPoolExecutor()
+client.loop.set_default_executor(pool)
+
 
 bot = Bot(client)
 
