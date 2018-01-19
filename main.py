@@ -193,8 +193,9 @@ async def leaderboard(message):
         m = message.server.get_member(f"{l.user.uid}")
         req = ((8 * l.level) + await diff(l.level)) * await mxp(l.level)
         expstr = f"{l.experience}/{req}"
+        username = m.name.decode('unicode_escape').encode('ascii', 'ignore')
         lines.append(
-            f"{m.name.ljust(32)}{str(l.level).ljust(8)}{expstr.ljust(10)}"
+            f"{username.ljust(32)}{str(l.level).ljust(8)}{expstr.ljust(10)}"
         )
 
     msg = '\n'.join(lines)
