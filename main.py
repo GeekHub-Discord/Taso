@@ -191,7 +191,7 @@ async def profile(message):
 
     msg = '\n'.join(lines)
 
-    await client.send_message(message.channel, "```{msg}```")
+    await client.send_message(message.channel, f"```{msg}```")
 
 @bot.command("leaderboard")
 async def leaderboard(message):
