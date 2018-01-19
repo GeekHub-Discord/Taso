@@ -176,7 +176,22 @@ async def remove_reward(message):
 
 @bot.command("profile")
 async def profile(message):
-    pass
+    server = Server.get(Server.sid == message.server.id)
+    user = User.get(User.uid == message.author.id)
+    l = LocalLevel.get(
+        (LocalLevel.user == user) &
+        (LocalLevel.server == server)
+    )
+    req = ((8 * l.level) + await diff(l.level)) * await mxp(l.level)
+    experience = f"{l.experience}/{req}"
+    lines = [
+        f"{'Level'.ljust(8)}{'Experience'.ljust(10)}"
+        f"{str(l.level).ljust(8)}{experience.ljust(10)}"
+    ]
+
+    msg = lines.join('\n')
+
+    await client.send_message(message.channel, "```{msg}```")
 
 @bot.command("leaderboard")
 async def leaderboard(message):
