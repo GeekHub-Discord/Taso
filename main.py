@@ -189,7 +189,7 @@ async def profile(message):
         f"{str(l.level).ljust(8)}{experience.ljust(10)}"
     ]
 
-    msg = lines.join('\n')
+    msg = '\n'.join(lines)
 
     await client.send_message(message.channel, "```{msg}```")
 
