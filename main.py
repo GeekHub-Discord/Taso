@@ -63,6 +63,8 @@ async def reply(text, message):
     await client.delete_message(m)
     await client.delete_message(message)
 
+def _removeNonAscii(s): return "".join(i for i in s if ord(i)<128)
+
 @bot.command('announce_channel', discord.Permissions(32))
 async def announce_channel(message):
     server = Server.get(Server.sid == message.server.id)
@@ -193,7 +195,7 @@ async def leaderboard(message):
         m = message.server.get_member(f"{l.user.uid}")
         req = ((8 * l.level) + await diff(l.level)) * await mxp(l.level)
         expstr = f"{l.experience}/{req}"
-        username = m.name.decode('unicode_escape').encode('ascii', 'ignore')
+        username = _removeNonAscii(m.name)
         lines.append(
             f"{username.ljust(32)}{str(l.level).ljust(8)}{expstr.ljust(10)}"
         )
