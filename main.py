@@ -197,7 +197,7 @@ async def leaderboard(message):
 
     msg = '\n'.join(lines)
 
-    codeblock = f"```close enough```"
+    codeblock = f"```{msg}```"
     await client.send_message(message.channel, codeblock)
 
 @client.event
