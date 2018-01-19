@@ -187,12 +187,14 @@ async def leaderboard(message):
 
     lines = []
     lines.append(
-        f"{'Username'.ljust(32)}{'Level'.ljust(6)}{'XP'.ljust(6)}"
+        f"{'Username'.ljust(32)}{'Level'.ljust(8)}{'XP'.ljust(10)}"
     )
     for l in leaders:
         m = message.server.get_member(f"{l.user.uid}")
+        req = ((8 * l.level) + await diff(l.level)) * await mxp(l.level)
+        expstr = f"{l.experience}/{req}"
         lines.append(
-            f"{m.name.ljust(32)}{str(l.level).ljust(6)}{str(l.experience).ljust(6)}"
+            f"{m.name.ljust(32)}{str(l.level).ljust(8)}{expstr.ljust(10)}"
         )
 
     msg = '\n'.join(lines)
