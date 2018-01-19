@@ -185,7 +185,7 @@ async def profile(message):
     req = ((8 * l.level) + await diff(l.level)) * await mxp(l.level)
     experience = f"{l.experience}/{req}"
     lines = [
-        f"{'Level'.ljust(8)}{'Experience'.ljust(10)}"
+        f"{'Level'.ljust(8)}{'Experience'.ljust(10)}",
         f"{str(l.level).ljust(8)}{experience.ljust(10)}"
     ]
 
