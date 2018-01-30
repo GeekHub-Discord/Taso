@@ -51,6 +51,7 @@ class LocalLevel(BaseModel):
 class Role(BaseModel):
     rid = BigIntegerField(null=False, primary_key=True)
     awardlevel = IntegerField(null=True)
+    leaderboard = BooleanField(null=False, default=False)
     assignable = BooleanField(null=False, default=False)
     server = ForeignKeyField(Server)
 
