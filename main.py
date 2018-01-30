@@ -174,6 +174,48 @@ async def remove_reward(message):
         message
     )
 
+@bot.command('addleaderrole', discord.Permissions(32))
+async def add_reward(message):
+    # Adds a leaderboard role
+    splitmsg = message.content.split()
+    rolename = ' '.join(splitmsg[1:-1])
+    level = splitmsg[-1]
+    role = discord.utils.get(message.server.roles, name=rolename)
+    server = Server.get(Server.sid == message.server.id)
+    r, created = Role.get_or_create(
+        rid=role.id,
+        defaults={
+            'awardlevel': None,
+            'leaderboard': True,
+            'server': server
+        }
+    )
+    if not created:
+        r.leaderboard = True
+        r.save()
+
+    await reply(
+        f"The {rolename} role will now be given when a user hits level {level}",
+        message
+    )
+
+@bot.command('removeleaderrole', discord.Permissions(32))
+async def remove_reward(message):
+    splitmsg = message.content.split()
+    rolename = ' '.join(splitmsg[1:])
+    role = discord.utils.get(message.server.roles, name=rolename)
+    try:
+        r = Role.get(Role.rid == role.id)
+        r.leaderboard = False
+        r.save()
+    except DoesNotExist as e:
+        return
+
+    await reply(
+        f"The {rolename} role will no longer given as a levelling reward",
+        message
+    )
+
 @bot.command("profile")
 async def profile(message):
     server = Server.get(Server.sid == message.server.id)
@@ -298,7 +340,7 @@ async def on_message(message):
                                 f"{party} {message.author.name}, you have leveled up to level {level}, and are now #{leaderboard_rank} on {message.server.name}! {party}")
 
                     try:
-                        role = Role.get(Role.awardlevel == level)
+                        role = Role.get(Role.awardlevel == level & Role.leaderboard == False)
                         lastrole = Role.select().where(
                             (Role.server == server) &
                             (Role.awardlevel.is_null(False)) &
