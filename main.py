@@ -276,14 +276,40 @@ async def on_message(message):
             try:
                 if level > local.level:
                     # User leveled up on the server
-                    lmsg = await client.send_message(message.channel,
-                            f"{party} {message.author.name}, you have leveled up to level {level} on {message.server.name}! {party}")
+                    leaders = LocalLevel.select().where(
+                        LocalLevel.server == server
+                    ).order_by(
+                        LocalLevel.level.desc(), LocalLevel.experience.desc()
+                    ).limit(10)
+
+                    iteration_rank = 0
+                    leaderboard_rank = 0
+                    for l in leaders:
+                        iteration_rank =+ 1
+                        if l.user.uid == message.author.id:
+                            leaderboard_rank = iteration_rank
+                            break
+
+                    if leaderboard_rank == 0:
+                        lmsg = await client.send_message(message.channel,
+                                f"{party} {message.author.name}, you have leveled up to level {level} on {message.server.name}! {party}")
+                    else:
+                        lmsg = await client.send_message(message.channel,
+                                f"{party} {message.author.name}, you have leveled up to level {level}, and are now #{leaderboard_rank} on {message.server.name}! {party}")
+
                     try:
                         role = Role.get(Role.awardlevel == level)
                         lastrole = Role.select().where(
                             (Role.server == server) &
                             (Role.awardlevel.is_null(False)) &
-                            (Role.awardlevel < level)
+                            (Role.awardlevel < level) &
+                            (Role.leaderboard == False)
+                            ).order_by(
+                                Role.awardlevel.desc()
+                            )
+                        leaderboard_roles = Role.select().where(
+                            (Role.server == server) &
+                            (Role.leaderboard == True)
                             ).order_by(
                                 Role.awardlevel.desc()
                             )
@@ -295,6 +321,25 @@ async def on_message(message):
                                 await client.remove_roles(message.author, r)
                             except BaseException as e:
                                 logger.exception("Couldn't remove role")
+
+                        for leaderboard_role in leaderboard_roles:
+                            if leaderboard_rank == 0:
+                                logger.info(f"Removing leaderboard role: {leaderboard_role.rid}")
+                                r = discord.utils.get(message.server.roles, id=f'{leaderboard_role.rid}')
+                                logger.info(f"Got leaderboard role {r.name}")
+                                try:
+                                    await client.remove_roles(message.author, r)
+                                except BaseException as e:
+                                    logger.exception("Couldn't remove leaderboard role")
+                            else:
+                                logger.info(f"Adding leaderboard role: {leaderboard_role.rid}")
+                                r = discord.utils.get(message.server.roles, id=f'{role.rid}')
+                                logger.info(f"Got leaderboard role {r.name}")
+                                try:
+                                    await client.add_roles(message.author, r)
+                                except BaseException as e:
+                                    logger.exception("Couldn't remove leaderboard role")
+
                         r = discord.utils.get(message.server.roles, id=f'{role.rid}')
                         await client.add_roles(message.author, r)
                     except DoesNotExist as e:
