@@ -83,7 +83,10 @@ async def announce_channel(message):
 async def iam(message):
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
-    role = discord.utils.get(message.server.roles, name=rolename)
+    role = None
+    for ro in message.server.roles:
+        if ro.name.lower() == rolename.lower():
+            role = ro
     try:
         r = Role.get(Role.rid == role.id)
         if r.assignable:
@@ -98,7 +101,10 @@ async def iam(message):
 async def iamnot(message):
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
-    role = discord.utils.get(message.server.roles, name=rolename)
+    role = None
+    for ro in message.server.roles:
+        if ro.name.lower() == rolename.lower():
+            role = ro
     try:
         r = Role.get(Role.rid == role.id)
         if r.assignable:
