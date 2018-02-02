@@ -375,20 +375,6 @@ async def on_message(message):
                             f" {party}")
 
                     try:
-                        try:
-                            role = Role.get(
-                                (Role.awardlevel == level &
-                                 Role.leaderboard is False))
-                        except BaseException as e:
-                                pass
-                        lastrole = Role.select().where(
-                            (Role.server == server) &
-                            (Role.awardlevel.is_null(False)) &
-                            (Role.awardlevel < level) &
-                            (Role.leaderboard is False)
-                            ).order_by(
-                                Role.awardlevel.desc()
-                            )
                         leaderboard_roles = Role.select().where(
                             (Role.server == server) &
                             (Role.leaderboard is True)
@@ -412,14 +398,28 @@ async def on_message(message):
                             else:
                                 logger.info("Adding leaderboard role:"
                                             f" {leaderboard_role.rid}")
-                                r = discord.utils.get(message.server.roles,
-                                                      id=f'{role.rid}')
+                                r = discord.utils.get(
+                                    message.server.roles,
+                                    id=f'{leaderboard_rank.rid}')
                                 logger.info(f"Got leaderboard role {r.name}")
                                 try:
                                     await client.add_roles(message.author, r)
                                 except BaseException as e:
                                     logger.exception("Couldn't remove"
                                                      " leaderboard role")
+                        try:
+                            role = Role.get(
+                                (Role.awardlevel == level))
+                        except Role.DoesNotExist as e:
+                            logger.error("Could not find the level up reward")
+                        lastrole = Role.select().where(
+                            (Role.server == server) &
+                            (Role.awardlevel.is_null(False)) &
+                            (Role.awardlevel < level) &
+                            (Role.leaderboard is False)
+                            ).order_by(
+                                Role.awardlevel.desc()
+                            )
                         if role:
                             oldroles = []
                             for lrole in lastrole:
