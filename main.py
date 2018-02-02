@@ -373,9 +373,12 @@ async def on_message(message):
                                 await client.remove_roles(member, leader_role)
                         await client.add_roles(message.author, leader_role)
                     try:
-                        role = Role.get(
-                            (Role.server == server) &
-                            (Role.awardlevel == level))
+                        try:
+                            role = Role.get(
+                                (Role.server == server) &
+                                (Role.awardlevel == level))
+                        except Role.DoesNotExist as e:
+                            role = None
                         lastrole = Role.select().where(
                             (Role.server == server) &
                             (Role.awardlevel.is_null(False)))
