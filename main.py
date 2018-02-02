@@ -419,7 +419,7 @@ async def on_message(message):
                                     logger.info(
                                         f"Removing old role: {lrole.rid}")
                                     for userrole in message.author.roles:
-                                        if userrole.id == lrole.rid:
+                                        if userrole.id == str(lrole.rid):
                                             r = discord.utils.get(
                                                 message.server.roles,
                                                 id=f'{lrole.rid}')
@@ -432,7 +432,12 @@ async def on_message(message):
                                     logger.exception("Couldn't remove role")
                                 r = discord.utils.get(message.server.roles,
                                                       id=f'{role.rid}')
-                                await client.add_roles(message.author, r)
+                                try:
+                                    await client.add_roles(message.author, r)
+                                except AttributeError as e:
+                                    logger.exception(
+                                        "Could not add role"
+                                    )
                         except Role.DoesNotExist as e:
                             logger.error("Could not find the level up reward")
                     except Role.DoesNotExist as e:
