@@ -359,10 +359,10 @@ async def on_message(message):
                             ).order_by(
                                 Role.awardlevel.desc()
                             )
-                        for leaderboard_role in leaderboard_roles:
-                            leader_role = discord.utils.get(
-                                message.server.roles,
-                                id=f'{leaderboard_role.rid}')
+
+                        leader_role = discord.utils.get(
+                            message.server.roles,
+                            id=f'{leaderboard_roles[0].rid}')
                         for member in message.server.members:
                             item = next(
                                 (i for i in member.roles
