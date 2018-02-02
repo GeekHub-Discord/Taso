@@ -433,6 +433,8 @@ async def on_message(message):
                                 r = discord.utils.get(message.server.roles,
                                                       id=f'{role.rid}')
                                 try:
+                                    logger.info(f"Adding role {r.name} to "
+                                                f"{message.author.name}")
                                     await client.add_roles(message.author, r)
                                 except AttributeError as e:
                                     logger.exception(
