@@ -352,7 +352,7 @@ async def on_message(message):
                         LocalLevel.level.desc(), LocalLevel.experience.desc()
                     ).limit(1)
 
-                    if f"{leaders.user.uid}" == message.author.id:
+                    if f"{leaders[0].user.uid}" == message.author.id:
                         leaderboard_roles = Role.select().where(
                             (Role.server == server) &
                             (Role.leaderboard is True)
