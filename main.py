@@ -403,6 +403,8 @@ async def on_message(message):
                                     id=f'{leaderboard_rank.rid}')
                                 logger.info(f"Got leaderboard role {r.name}")
                                 try:
+                                    logger.info(f"Adding role {r.name} to "
+                                            f"{message.author.name}")
                                     await client.add_roles(message.author, r)
                                 except BaseException as e:
                                     logger.exception("Couldn't remove"
