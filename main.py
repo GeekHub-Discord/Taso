@@ -409,6 +409,7 @@ async def on_message(message):
                                                      " leaderboard role")
                         try:
                             role = Role.get(
+                                (Role.server == server) &
                                 (Role.awardlevel == level))
                             lastrole = Role.select().where(
                                 (Role.server == server) &
@@ -441,7 +442,7 @@ async def on_message(message):
                                         "Could not add role"
                                     )
                         except Role.DoesNotExist as e:
-                            logger.error("Could not find the level up reward")
+                            logger.exception("Count not find level up reward")
                     except Role.DoesNotExist as e:
                         logger.exception("Could not find level up reward")
             except Exception as e:
