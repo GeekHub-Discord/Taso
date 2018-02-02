@@ -5,8 +5,7 @@ import discord
 import logging
 import uvloop
 from bot import Bot
-from functools import wraps
-from models import *
+from models import Server, User, LocalLevel, Role
 
 party = "🎉"
 
@@ -18,6 +17,7 @@ client.loop.set_default_executor(pool)
 
 
 bot = Bot(client)
+
 
 def get_logger(name):
     logger = logging.getLogger(name)
@@ -31,13 +31,17 @@ def get_logger(name):
         logger.addHandler(sh)
     return logger
 
+
 logger = get_logger('taso')
+
 
 async def mxp(level):
     return (45 + (5 * level))
 
+
 async def diff(level):
     return max(0, (5 * (level - 30)))
+
 
 async def levelup(level, exp):
     req = ((8 * level) + await diff(level)) * await mxp(level)
@@ -53,6 +57,7 @@ async def levelup(level, exp):
 
 lock = asyncio.Lock()
 
+
 async def reply(text, message):
     m = await client.send_message(
         message.channel,
@@ -63,7 +68,9 @@ async def reply(text, message):
     await client.delete_message(m)
     await client.delete_message(message)
 
-def _removeNonAscii(s): return "".join(i for i in s if ord(i)<128)
+
+def _removeNonAscii(s): return "".join(i for i in s if ord(i) < 128)
+
 
 @bot.command('announce_channel', discord.Permissions(32))
 async def announce_channel(message):
@@ -71,8 +78,9 @@ async def announce_channel(message):
     server.announce_channel = message.channel.id
     await reply(f"I will now do server level up announcements here.", message)
 
+
 @bot.command('iam')
-async def add_role(message):
+async def iam(message):
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
     role = discord.utils.get(message.server.roles, name=rolename)
@@ -80,13 +88,14 @@ async def add_role(message):
         r = Role.get(Role.rid == role.id)
         if r.assignable:
             await client.add_roles(message.author, role)
-    except DoesNotExist as e:
+    except Role.DoesNotExist as e:
         return
 
     await reply(f"I have given you the {rolename} role", message)
 
+
 @bot.command('iamnot')
-async def remove_role(message):
+async def iamnot(message):
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
     role = discord.utils.get(message.server.roles, name=rolename)
@@ -94,10 +103,11 @@ async def remove_role(message):
         r = Role.get(Role.rid == role.id)
         if r.assignable:
             await client.remove_roles(message.author, role)
-    except DoesNotExist as e:
+    except Role.DoesNotExist as e:
         return
 
     await reply(f"I have removed the {rolename} role from you", message)
+
 
 @bot.command('addrole', discord.Permissions(32))
 async def add_role(message):
@@ -119,6 +129,7 @@ async def add_role(message):
 
     await reply(f"The {rolename} role is now assignable", message)
 
+
 @bot.command('removerole', discord.Permissions(32))
 async def remove_role(message):
     splitmsg = message.content.split()
@@ -128,10 +139,11 @@ async def remove_role(message):
         r = Role.get(Role.rid == role.id)
         r.assignable = False
         r.save()
-    except DoesNotExist as e:
+    except Role.DoesNotExist as e:
         return
 
     await reply(f"The {rolename} role is now assignable", message)
+
 
 @bot.command('addreward', discord.Permissions(32))
 async def add_reward(message):
@@ -153,9 +165,11 @@ async def add_reward(message):
         r.save()
 
     await reply(
-        f"The {rolename} role will now be given when a user hits level {level}",
+        f"The {rolename} role will now be given when a user"
+        " hits level {level}",
         message
     )
+
 
 @bot.command('removereward', discord.Permissions(32))
 async def remove_reward(message):
@@ -166,7 +180,7 @@ async def remove_reward(message):
         r = Role.get(Role.rid == role.id)
         r.awardlevel = None
         r.save()
-    except DoesNotExist as e:
+    except Role.DoesNotExist as e:
         return
 
     await reply(
@@ -174,8 +188,9 @@ async def remove_reward(message):
         message
     )
 
+
 @bot.command('addleaderrole', discord.Permissions(32))
-async def add_reward(message):
+async def add_leader_role(message):
     # Adds a leaderboard role
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
@@ -194,12 +209,14 @@ async def add_reward(message):
         r.save()
 
     await reply(
-        f"The {rolename} role will now be given when a user enters the leaderboard",
+        f"The {rolename} role will now be given when a user enters"
+        " the leaderboard",
         message
     )
 
+
 @bot.command('removeleaderrole', discord.Permissions(32))
-async def remove_reward(message):
+async def remove_leader_role(message):
     splitmsg = message.content.split()
     rolename = ' '.join(splitmsg[1:])
     role = discord.utils.get(message.server.roles, name=rolename)
@@ -207,7 +224,7 @@ async def remove_reward(message):
         r = Role.get(Role.rid == role.id)
         r.leaderboard = False
         r.save()
-    except DoesNotExist as e:
+    except Role.DoesNotExist as e:
         return
 
     await reply(
@@ -215,24 +232,26 @@ async def remove_reward(message):
         message
     )
 
+
 @bot.command("profile")
 async def profile(message):
     server = Server.get(Server.sid == message.server.id)
     user = User.get(User.uid == message.author.id)
-    l = LocalLevel.get(
+    lvl = LocalLevel.get(
         (LocalLevel.user == user) &
         (LocalLevel.server == server)
     )
-    req = ((8 * l.level) + await diff(l.level)) * await mxp(l.level)
-    experience = f"{l.experience}/{req}"
+    req = ((8 * lvl.level) + await diff(lvl.level)) * await mxp(lvl.level)
+    experience = f"{lvl.experience}/{req}"
     lines = [
         f"{'Level'.ljust(8)}{'Experience'.ljust(10)}",
-        f"{str(l.level).ljust(8)}{experience.ljust(10)}"
+        f"{str(lvl.level).ljust(8)}{experience.ljust(10)}"
     ]
 
     msg = '\n'.join(lines)
 
     await client.send_message(message.channel, f"```{msg}```")
+
 
 @bot.command("leaderboard")
 async def leaderboard(message):
@@ -261,9 +280,11 @@ async def leaderboard(message):
     codeblock = f"```{msg}```"
     await client.send_message(message.channel, codeblock)
 
+
 @client.event
 async def on_ready():
     logger.info(f"{client.user.name} ({client.user.id}) is now online!")
+
 
 @client.event
 async def on_message(message):
@@ -294,8 +315,10 @@ async def on_message(message):
                     if server.announce_channel:
                         channel = client.get_channel(
                                 f'{server.announce_channel}')
-                        smsg = await client.send_message(channel,
-                                f"{party} {message.server.name} is now level {level}! {party}")
+                        smsg = await client.send_message(
+                            channel,
+                            f"{party} {message.server.name} is now level"
+                            f" {level}! {party}")
             except Exception as e:
                 pass
 
@@ -326,66 +349,86 @@ async def on_message(message):
                     iteration_rank = 0
                     leaderboard_rank = 0
                     for l in leaders:
-                        iteration_rank =+ 1
+                        iteration_rank += 1
                         if f"l.user.uid" == f"message.author.id":
                             leaderboard_rank = iteration_rank
                             break
 
                     if leaderboard_rank == 0:
-                        lmsg = await client.send_message(message.channel,
-                                f"{party} {message.author.name}, you have leveled up to level {level} on {message.server.name}! {party}")
+                        lmsg = await client.send_message(
+                            message.channel,
+                            f"{party} {message.author.name}, you have leveled"
+                            f" up to level {level} on {message.server.name}!"
+                            f" {party}")
                     else:
-                        lmsg = await client.send_message(message.channel,
-                                f"{party} {message.author.name}, you have leveled up to level {level}, and are now #{leaderboard_rank} on {message.server.name}! {party}")
+                        lmsg = await client.send_message(
+                            message.channel,
+                            f"{party} {message.author.name}, you have leveled"
+                            f" up to level {level}, and are now "
+                            f"#{leaderboard_rank} on {message.server.name}!"
+                            f" {party}")
 
                     try:
                         try:
-                            role = Role.get(Role.awardlevel == level & Role.leaderboard == False)
+                            role = Role.get(
+                                (Role.awardlevel == level &
+                                 Role.leaderboard is False))
                         except BaseException as e:
                                 pass
                         lastrole = Role.select().where(
                             (Role.server == server) &
                             (Role.awardlevel.is_null(False)) &
                             (Role.awardlevel < level) &
-                            (Role.leaderboard == False)
+                            (Role.leaderboard is False)
                             ).order_by(
                                 Role.awardlevel.desc()
                             )
                         leaderboard_roles = Role.select().where(
                             (Role.server == server) &
-                            (Role.leaderboard == True)
+                            (Role.leaderboard is True)
                             ).order_by(
                                 Role.awardlevel.desc()
                             )
                         for leaderboard_role in leaderboard_roles:
                             if leaderboard_rank == 0:
-                                logger.info(f"Removing leaderboard role: {leaderboard_role.rid}")
-                                r = discord.utils.get(message.server.roles, id=f'{leaderboard_role.rid}')
+                                logger.info(f"Removing leaderboard role:"
+                                            " {leaderboard_role.rid}")
+                                r = discord.utils.get(
+                                    message.server.roles,
+                                    id=f'{leaderboard_role.rid}')
                                 logger.info(f"Got leaderboard role {r.name}")
                                 try:
-                                    await client.remove_roles(message.author, r)
+                                    await client.remove_roles(
+                                        message.author, r)
                                 except BaseException as e:
-                                    logger.exception("Couldn't remove leaderboard role")
+                                    logger.exception("Couldn't remove"
+                                                     " leaderboard role")
                             else:
-                                logger.info(f"Adding leaderboard role: {leaderboard_role.rid}")
-                                r = discord.utils.get(message.server.roles, id=f'{role.rid}')
+                                logger.info("Adding leaderboard role:"
+                                            f" {leaderboard_role.rid}")
+                                r = discord.utils.get(message.server.roles,
+                                                      id=f'{role.rid}')
                                 logger.info(f"Got leaderboard role {r.name}")
                                 try:
                                     await client.add_roles(message.author, r)
                                 except BaseException as e:
-                                    logger.exception("Couldn't remove leaderboard role")
+                                    logger.exception("Couldn't remove"
+                                                     " leaderboard role")
                         if "role" in locals():
                             for lrole in lastrole:
                                 logger.info(f"Removing old role: {lrole.rid}")
-                                r = discord.utils.get(message.server.roles, id=f'{lrole.rid}')
+                                r = discord.utils.get(message.server.roles,
+                                                      id=f'{lrole.rid}')
                                 logger.info(f"Got role {r.name}")
                                 try:
-                                    await client.remove_roles(message.author, r)
+                                    await client.remove_roles(
+                                        message.author, r)
                                 except BaseException as e:
                                     logger.exception("Couldn't remove role")
-                                r = discord.utils.get(message.server.roles, id=f'{role.rid}')
+                                r = discord.utils.get(message.server.roles,
+                                                      id=f'{role.rid}')
                                 await client.add_roles(message.author, r)
-                    except DoesNotExist as e:
+                    except Role.DoesNotExist as e:
                         logger.exception("Could not find level up reward")
             except Exception as e:
                 logger.exception("Could not process level up")

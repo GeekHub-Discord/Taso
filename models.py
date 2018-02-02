@@ -1,15 +1,18 @@
 import config
-from peewee import *
-import pymysql
+from peewee import BigIntegerField, IntegerField, ForeignKeyField, \
+                   MySQLDatabase, SqliteDatabase, BooleanField, Model
 from playhouse.shortcuts import RetryOperationalError
 
 cfg = config.botConfig()
 
+
 class MySQLDB(RetryOperationalError, MySQLDatabase):
     pass
 
+
 class SqliteDB(SqliteDatabase):
     pass
+
 
 if cfg.dbtype == 'sqlite':
     my_db = SqliteDB(f'{cfg.database}.db')

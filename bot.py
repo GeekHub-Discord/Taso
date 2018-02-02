@@ -1,6 +1,7 @@
 import discord
 import logging
 
+
 def get_logger(name):
     logger = logging.getLogger(name)
     if not logger.handlers:
@@ -13,7 +14,9 @@ def get_logger(name):
         logger.addHandler(sh)
     return logger
 
+
 logger = get_logger('taso')
+
 
 class Bot():
     def __init__(self, client):
