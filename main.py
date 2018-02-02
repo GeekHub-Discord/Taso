@@ -415,11 +415,7 @@ async def on_message(message):
                         lastrole = Role.select().where(
                             (Role.server == server) &
                             (Role.awardlevel.is_null(False)) &
-                            (Role.awardlevel < level) &
-                            (Role.leaderboard is False)
-                            ).order_by(
-                                Role.awardlevel.desc()
-                            )
+                            (Role.leaderboard is False))
                         if role:
                             oldroles = []
                             for lrole in lastrole:
