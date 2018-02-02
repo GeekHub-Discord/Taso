@@ -172,7 +172,7 @@ async def add_reward(message):
 
     await reply(
         f"The {rolename} role will now be given when a user"
-        " hits level {level}",
+        f" hits level {level}",
         message
     )
 
