@@ -379,26 +379,7 @@ async def on_message(message):
                                 (Role.awardlevel == level))
                         except Role.DoesNotExist as e:
                             role = None
-                        lastrole = Role.select().where(
-                            (Role.server == server) &
-                            (Role.awardlevel.is_null(False)))
                         if role:
-                            oldroles = []
-                            for lrole in lastrole:
-                                logger.info(
-                                    f"Removing old role: {lrole.rid}")
-                                for userrole in message.author.roles:
-                                    if userrole.id == str(lrole.rid):
-                                        r = discord.utils.get(
-                                            message.server.roles,
-                                            id=f'{lrole.rid}')
-                                        oldroles.append(r)
-                                        logger.info(f"Got role {r.name}")
-                            try:
-                                await client.remove_roles(
-                                    message.author, *oldroles)
-                            except BaseException as e:
-                                logger.exception("Couldn't remove role")
                             r = discord.utils.get(message.server.roles,
                                                   id=f'{role.rid}')
                             try:
