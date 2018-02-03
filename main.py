@@ -276,7 +276,10 @@ async def leaderboard(message):
         m = message.server.get_member(f"{l.user.uid}")
         req = ((8 * l.level) + await diff(l.level)) * await mxp(l.level)
         expstr = f"{l.experience}/{req}"
-        username = _removeNonAscii(m.name)
+        if m is not None:
+          username = _removeNonAscii(m.name)
+        else:
+          username = "Unknown User"
         lines.append(
             f"{username.ljust(32)}{str(l.level).ljust(8)}{expstr.ljust(10)}"
         )
