@@ -358,7 +358,7 @@ async def on_message(message):
                     if f"{leaders[0].user.uid}" == message.author.id:
                         leaderboard_roles = Role.select().where(
                             (Role.server == server) &
-                            (Role.leaderboard is True)
+                            (Role.leaderboard == True)
                             ).order_by(
                                 Role.awardlevel.desc()
                             )
